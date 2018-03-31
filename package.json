@@ -1,0 +1,39 @@
+{
+  "name": "onesky-sync",
+  "version": "1.0.1",
+  "description": "Onesky CLI wrapper over onesky-utils",
+  "main": "index.js",
+  "bin": "cli.js",
+  "scripts": {
+    "format": "prettier --write *"
+  },
+  "author": {
+    "name": "Pavel Frankov",
+    "email": "pavel@frankov.ru"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pfrankov/onesky-sync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pfrankov/onesky-sync/issues"
+  },
+  "keywords": [
+    "onesky",
+    "translations",
+    "onesky-utils",
+    "onesky-cli",
+    "cli",
+    "i18n"
+  ],
+  "dependencies": {
+    "@brainly/onesky-utils": "^1.3.0",
+    "fs-extra": "^5.0.0",
+    "meow": "^4.0.0",
+    "ora": "^2.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.11.1"
+  }
+}
