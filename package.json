@@ -1,6 +1,6 @@
 {
   "name": "onesky-sync",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "OneSky CLI wrapper over onesky-utils",
   "main": "index.js",
   "bin": "cli.js",

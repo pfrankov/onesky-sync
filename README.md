@@ -7,7 +7,7 @@ Simple CLI wrapper over [@brainly/onesky-utils](https://github.com/brainly/nodej
 ## Installation
 
 ```bash
-npm install --save-dev onesky-sync
+npm install -g onesky-sync
 ```
 
 ## Usage

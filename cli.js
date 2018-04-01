@@ -29,7 +29,19 @@ const cli = meow(
     Example
       $ onesky-sync upload ./translations/en.json --api-key=111 --secret=111 --project-id=111
       $ onesky-sync download ./translations/ru.json --file-name=en.json --language=ru --api-key=111 --secret=111 --project-id=111
-`
+`,
+  {
+    flags: {
+      keepStrings: {
+        type: "boolean",
+        default: false
+      },
+      allowSameAsOriginal: {
+        type: "boolean",
+        default: false
+      }
+    }
+  }
 );
 
 const [command, ...files] = cli.input;
