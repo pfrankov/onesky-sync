@@ -10,9 +10,9 @@ const cli = meow(
       $ onesky-sync download <input>
  
     Options
-      --api-key
-      --secret
-      --project-id
+      --api-key         Required
+      --secret          Required
+      --project-id      Required
       
       Download
         --file-name

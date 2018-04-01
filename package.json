@@ -1,7 +1,7 @@
 {
   "name": "onesky-sync",
-  "version": "1.0.1",
-  "description": "Onesky CLI wrapper over onesky-utils",
+  "version": "1.0.2",
+  "description": "OneSky CLI wrapper over onesky-utils",
   "main": "index.js",
   "bin": "cli.js",
   "scripts": {
@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "@brainly/onesky-utils": "^1.3.0",
+    "chalk": "^2.3.2",
     "fs-extra": "^5.0.0",
     "meow": "^4.0.0",
     "ora": "^2.0.0"

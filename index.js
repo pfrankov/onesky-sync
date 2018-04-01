@@ -2,15 +2,42 @@ const onesky = require("@brainly/onesky-utils");
 const fs = require("fs-extra");
 const path = require("path");
 const ora = require("ora");
+const chalk = require("chalk");
+
+function validationError(message) {
+  console.error(chalk.bold.red(`✖ ${message}`));
+  process.exit(1);
+}
+
+function oneSkyErrorMessageHandler(spinner, code, message) {
+  spinner.fail(code ? chalk.bold.red(`${code}: `) : "" + chalk.red(message));
+  process.exit(1);
+}
 
 module.exports = function(command, files = [], _options) {
+  if (!_options.apiKey) {
+    validationError(
+      "--api-key is required. You can obtain it on Site Settings page on OneSky"
+    );
+  }
+  if (!_options.secret) {
+    validationError(
+      "--secret is required. You can obtain it on Site Settings page on OneSky"
+    );
+  }
+  if (!_options.projectId) {
+    validationError(
+      "--project-id is required. You will found it in the URL `admin/project/dashboard/project/:project-id` on OneSky"
+    );
+  }
+
   ({
     upload() {
       if (!files.length) {
-        throw new Error("Pass JSON file as an argument to upload");
+        validationError("Path to uploading file is required");
       }
       if (files.length > 1) {
-        throw new Error("Too many files to upload. Expected 1");
+        validationError("Too many files to upload. Expected 1");
       }
 
       const file = files[0];
@@ -39,16 +66,17 @@ module.exports = function(command, files = [], _options) {
             );
           }
         })
-        .catch(message => {
-          spinner.fail(message);
+        .catch(({ message, code }) => {
+          oneSkyErrorMessageHandler(spinner, code, message);
         });
     },
+
     download() {
       if (!files.length) {
-        throw new Error("Pass JSON file as an argument to download");
+        validationError("Path to downloading file is required");
       }
       if (files.length > 1) {
-        throw new Error("Too many files to download. Expected 1");
+        validationError("Too many files to download. Expected 1");
       }
 
       const options = Object.assign({}, _options);
@@ -62,11 +90,11 @@ module.exports = function(command, files = [], _options) {
           return fs.ensureFile(file).then(() => {
             fs.writeFileSync(file, data);
 
-            spinner.succeed(`Downloaded \`${file}\``).stop();
+            spinner.succeed(`Downloaded \`${file}\``);
           });
         })
-        .catch(message => {
-          spinner.fail(message);
+        .catch(({ message, code }) => {
+          oneSkyErrorMessageHandler(spinner, code, message);
         });
     }
   }[command]());
