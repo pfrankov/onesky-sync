@@ -14,7 +14,7 @@ npm install -g onesky-sync
 
 ```bash
 onesky-sync upload <input> [options]
-onesky-sync download <input> [options]
+onesky-sync download <output> [options]
 ```
 
 ##### Common options
@@ -31,6 +31,7 @@ You can pass any options from [onesky-utils API](https://github.com/brainly/node
 
 ```bash
 onesky-sync upload ./translations/en.json --api-key=111 --secret=111 --project-id=111
+onesky-sync upload ./translations/*.json --api-key=111 --secret=111 --project-id=111
 ```
 
 | Option                   | Required | Default Value        | Description                                                                                                      |
@@ -45,10 +46,11 @@ onesky-sync upload ./translations/en.json --api-key=111 --secret=111 --project-i
 #### Download
 
 ```bash
-onesky-sync download ./translations/ru.json --file-name=en.json --language=ru --api-key=111 --secret=111 --project-id=111
+onesky-sync download ./translations/ --file-name=en.json --language=ru --api-key=111 --secret=111 --project-id=111
+onesky-sync download ./translations/ --file-name=en.json --api-key=111 --secret=111 --project-id=111
 ```
 
-| Option      | Required | Default Value | Description              |
-| ----------- | :------: | ------------- | ------------------------ |
-| `language`  |    ✔     |               | Language code            |
-| `file-name` |    ✔     |               | Name of translation file |
+| Option      | Required | Default Value              | Description              |
+| ----------- | :------: | -------------------------- | ------------------------ |
+| `language`  |          | All available translations | Language code            |
+| `file-name` |    ✔     |                            | Name of translation file |

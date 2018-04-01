@@ -36,50 +36,46 @@ module.exports = function(command, files = [], _options) {
       if (!files.length) {
         validationError("Path to uploading file is required");
       }
-      if (files.length > 1) {
-        validationError("Too many files to upload. Expected 1");
-      }
 
-      const file = files[0];
+      files.forEach(file => {
+        const options = Object.assign(
+          {
+            language: "en",
+            fileName: `${path.parse(file).base}`,
+            format: "HIERARCHICAL_JSON",
+            content: fs.readFileSync(file).toString(),
+            keepStrings: false
+          },
+          _options
+        );
 
-      const options = Object.assign(
-        {
-          language: "en",
-          fileName: `${path.parse(file).base}`,
-          format: "HIERARCHICAL_JSON",
-          content: fs.readFileSync(files[0]).toString(),
-          keepStrings: false
-        },
-        _options
-      );
+        const spinner = ora(`Uploading \`${options.fileName}\``).start();
 
-      const spinner = ora(`Uploading \`${options.fileName}\``).start();
-
-      onesky
-        .postFile(options)
-        .then(data => {
-          const { meta, data: { name, language: { code } } } = JSON.parse(data);
-
-          if (meta.status === 201) {
-            spinner.succeed(
-              `File \`${name}\` for \`${code}\` locale was uploaded successfully`
+        onesky
+          .postFile(options)
+          .then(data => {
+            const { meta, data: { name, language: { code } } } = JSON.parse(
+              data
             );
-          }
-        })
-        .catch(({ message, code }) => {
-          oneSkyErrorMessageHandler(spinner, code, message);
-        });
+
+            if (meta.status === 201) {
+              spinner.succeed(
+                `File \`${name}\` for \`${code}\` locale was uploaded successfully`
+              );
+            }
+          })
+          .catch(({ message, code }) => {
+            oneSkyErrorMessageHandler(spinner, code, message);
+          });
+      });
     },
 
     download() {
       if (!files.length) {
-        validationError("Path to downloading file is required");
+        validationError("Path to output directory is required");
       }
       if (files.length > 1) {
-        validationError("Too many files to download. Expected 1");
-      }
-      if (!_options.language) {
-        validationError("--language code is required for `download`");
+        validationError("Too many directories. Expected 1");
       }
       if (!_options.fileName) {
         validationError("--file-name is required for `download`");
@@ -88,19 +84,83 @@ module.exports = function(command, files = [], _options) {
       const options = Object.assign({}, _options);
       const file = files[0];
 
-      const spinner = ora(`Downloading \`${file}\``).start();
-
-      onesky
-        .getFile(options)
-        .then(data => {
-          return fs.ensureFile(file).then(() => {
-            fs.writeFileSync(file, data);
-
-            spinner.succeed(`Downloaded \`${file}\``);
-          });
+      const langsListPromise = Promise.resolve()
+        .then(() => {
+          if (!options.language) {
+            return Promise.reject();
+          }
+          return [options.language];
         })
-        .catch(({ message, code }) => {
-          oneSkyErrorMessageHandler(spinner, code, message);
+        .catch(() => {
+          const downloadingLanguages = ora(
+            `Getting language list for \`${options.fileName}\``
+          ).start();
+
+          return onesky
+            .getLanguages({
+              apiKey: options.apiKey,
+              secret: options.secret,
+              projectId: options.projectId
+            })
+            .then(response => {
+              const { data } = JSON.parse(response);
+              downloadingLanguages.succeed();
+
+              return data
+                .filter(lang => !lang.is_base_language)
+                .map(lang => lang.code);
+            })
+            .catch(({ message, code }) => {
+              oneSkyErrorMessageHandler(downloadingLanguages, code, message);
+            });
+        });
+
+      Promise.resolve()
+        .then(() => langsListPromise)
+        .then(langsList => {
+          const downloadingSpinner = ora(
+            `Downloading translations for \`${options.fileName}\``
+          ).start();
+
+          return onesky
+            .getMultilingualFile(options)
+            .then(response => {
+              downloadingSpinner.succeed();
+
+              const translations = JSON.parse(response);
+              const translationCodes = Object.keys(translations);
+
+              langsList.forEach(code => {
+                const lang = translations[code];
+                const ext = path.parse(options.fileName).ext;
+                const filename = `${code}${ext}`;
+                const filepath = path.join(file, filename);
+                const savingSpinner = ora(`Saving \`${filepath}\``).start();
+
+                if (!lang || !lang.translation) {
+                  savingSpinner.fail(
+                    `There is no translation for \`${code}\` code. Found \`${translationCodes.join(
+                      ", "
+                    )}\` instead`
+                  );
+                  return;
+                }
+
+                fs
+                  .ensureFile(filepath)
+                  .then(() => {
+                    return fs.writeFileSync(filepath, lang.translation);
+                  })
+                  .catch(({ message }) => {
+                    oneSkyErrorMessageHandler(savingSpinner, null, message);
+                  });
+
+                savingSpinner.succeed();
+              });
+            })
+            .catch(({ message, code }) => {
+              oneSkyErrorMessageHandler(downloadingSpinner, code, message);
+            });
         });
     }
   }[command]());

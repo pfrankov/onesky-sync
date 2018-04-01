@@ -7,7 +7,7 @@ const cli = meow(
   `
     Usage
       $ onesky-sync upload <input> [options]
-      $ onesky-sync download <input> [options]
+      $ onesky-sync download <ouput> [options]
  
     Options
       --api-key         Required
@@ -15,7 +15,7 @@ const cli = meow(
       --project-id      Required
       
       Download
-        --language      Required
+        --language
         --file-name     Required
       
       Upload
@@ -27,8 +27,8 @@ const cli = meow(
         --allow-same-as-original=false
         
     Example
-      $ onesky-sync upload ./translations/en.json --api-key=111 --secret=111 --project-id=111
-      $ onesky-sync download ./translations/ru.json --file-name=en.json --language=ru --api-key=111 --secret=111 --project-id=111
+      $ onesky-sync upload ./translations/*.json --api-key=111 --secret=111 --project-id=111
+      $ onesky-sync download ./translations --file-name=en.json --language=ru --api-key=111 --secret=111 --project-id=111
 `,
   {
     flags: {
