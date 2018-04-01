@@ -149,7 +149,9 @@ module.exports = function(command, files = [], _options) {
                 fs
                   .ensureFile(filepath)
                   .then(() => {
-                    return fs.writeFileSync(filepath, lang.translation);
+                    return fs.writeJson(filepath, lang.translation, {
+                      spaces: 2
+                    });
                   })
                   .catch(({ message }) => {
                     oneSkyErrorMessageHandler(savingSpinner, null, message);
