@@ -6,8 +6,8 @@ const oneskySync = require(".");
 const cli = meow(
   `
     Usage
-      $ onesky-sync upload <input>
-      $ onesky-sync download <input>
+      $ onesky-sync upload <input> [options]
+      $ onesky-sync download <input> [options]
  
     Options
       --api-key         Required
@@ -15,10 +15,12 @@ const cli = meow(
       --project-id      Required
       
       Download
-        --file-name
-        --language=en
+        --language      Required
+        --file-name     Required
       
       Upload
+        --language=en
+        --file-name
         --format=HIERARCHICAL_JSON
         --content
         --keep-strings=false

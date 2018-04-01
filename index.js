@@ -78,6 +78,12 @@ module.exports = function(command, files = [], _options) {
       if (files.length > 1) {
         validationError("Too many files to download. Expected 1");
       }
+      if (!_options.language) {
+        validationError("--language code is required for `download`");
+      }
+      if (!_options.fileName) {
+        validationError("--file-name is required for `download`");
+      }
 
       const options = Object.assign({}, _options);
       const file = files[0];
